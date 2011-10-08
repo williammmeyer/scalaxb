@@ -98,12 +98,14 @@ trait Version { val version = "%s" }
 //  import ScriptedPlugin._
   lazy val pluginSettings = buildSettings ++ Seq(
     sbtPlugin := true,
-    description in lsync := """sbt plugin to run scalaxb""",
-    crossScalaVersions := Seq("2.9.1"),
-    publishMavenStyle := true) // ++
-//    ScriptedPlugin.scriptedSettings ++ Seq(
-//    scriptedBufferLog := false
-//  )
+    // description in lsync := """sbt plugin to run scalaxb""",
+    crossScalaVersions := Seq("2.8.1"),
+    publishMavenStyle := true,
+    version <<= (sbtVersion, version) { (sv, nv) => "sbt" + sv + "_" + nv }
+    ) // ++
+    // ScriptedPlugin.scriptedSettings ++ Seq(
+    // scriptedBufferLog := false
+  // )
 
   lazy val noPublish: Seq[Project.Setting[_]] = Seq(
     publish := {},
@@ -126,6 +128,7 @@ trait Version { val version = "%s" }
     settings = itSettings) dependsOn(cli % "test->compile")
   lazy val scalaxbPlugin = Project("sbt-scalaxb", file("sbt-scalaxb"),
     settings = pluginSettings) dependsOn(cli)
+
 //  lazy val appengine = Project("web", file("web"),
 //    settings = webSettings) dependsOn(cli)
 
