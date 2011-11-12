@@ -2,9 +2,9 @@ import sbt._
 
 object Builds extends Build {
   import Keys._
-  import ls.Plugin.LsKeys._
+//  import ls.Plugin.LsKeys._
 
-  lazy val buildSettings = Defaults.defaultSettings ++ customLsSettings ++ Seq(
+  lazy val buildSettings = Defaults.defaultSettings /*++ customLsSettings*/ ++ Seq(
     version := "0.6.7",
     organization := "org.scalaxb",
     homepage := Some(url("http://scalaxb.org")),
