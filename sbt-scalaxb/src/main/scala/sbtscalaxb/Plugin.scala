@@ -12,6 +12,8 @@ object Plugin extends sbt.Plugin {
     lazy val scalaxb          = TaskKey[Seq[File]]("scalaxb")
     lazy val generate         = TaskKey[Seq[File]]("scalaxb-generate")
     lazy val scalaxbConfig    = SettingKey[ScConfig]("scalaxb-config")
+    lazy val scalaxbConfig1   = SettingKey[Config1]("scalaxb-config1")
+    lazy val scalaxbConfig2   = SettingKey[Config2]("scalaxb-config2")
     lazy val xsdSource        = SettingKey[File]("scalaxb-xsd-source")
     lazy val wsdlSource       = SettingKey[File]("scalaxb-wsdl-source")
     lazy val packageName      = SettingKey[String]("scalaxb-package-name")
@@ -73,31 +75,59 @@ object Plugin extends sbt.Plugin {
     laxAny in scalaxb := false,
     combinedPackageNames in scalaxb <<= (packageName in scalaxb, packageNames in scalaxb) { (x, xs) =>
       (xs map { case (k, v) => ((Some(k.toString): Option[String]), Some(v)) }) updated (None, Some(x)) },
-    scalaxbConfig in scalaxb <<= Project.app((combinedPackageNames in scalaxb) :^:
-        (packageDir in scalaxb) :^:
-        (classPrefix in scalaxb) :^:
-        (paramPrefix in scalaxb) :^:
-        (attributePrefix in scalaxb) :^:
-        (wrapContents in scalaxb) :^:
-        (generateRuntime in scalaxb) :^:
-        (chunkSize in scalaxb) :^:
-        (protocolFileName in scalaxb) :^:
-        (protocolPackageName in scalaxb) :^:
-        (laxAny in scalaxb) :^: KNil) {
-          case pkg :+: pkgdir :+: cpre :+: ppre :+: apre :+: w :+: rt :+: cs :+: pfn :+: ppn :+: la :+: HNil =>
-            ScConfig(packageNames = pkg,
-              packageDir = pkgdir,
-              classPrefix = cpre,
-              paramPrefix = ppre,
-              attributePrefix = apre,
-              wrappedComplexTypes = w.toList,
-              generateRuntime = rt,
-              sequenceChunkSize = cs,
-              protocolFileName = pfn,
-              protocolPackageName = ppn,
-              laxAny = la
-            )
-          },
+    scalaxbConfig1 in scalaxb <<= (combinedPackageNames in scalaxb,
+        packageDir in scalaxb,
+        classPrefix in scalaxb,
+        paramPrefix in scalaxb,
+        attributePrefix in scalaxb,
+        wrapContents in scalaxb) { (pkg, pkgdir, cpre, ppre, apre, w) =>
+      Config1(packageNames = pkg,
+        packageDir = pkgdir,
+        classPrefix = cpre,
+        paramPrefix = ppre,
+        attributePrefix = apre,
+        wrappedComplexTypes = w.toList) },
+    scalaxbConfig2 in scalaxb <<= (generateRuntime in scalaxb,
+        chunkSize in scalaxb,
+        protocolFileName in scalaxb,
+        protocolPackageName in scalaxb,
+        laxAny in scalaxb) { (rt, cs, pfn, ppn, la) =>
+      Config2(generateRuntime = rt,
+        sequenceChunkSize = cs,
+        protocolFileName = pfn,
+        protocolPackageName = ppn,
+        laxAny = la) },
+    scalaxbConfig in scalaxb <<= (scalaxbConfig1 in scalaxb, scalaxbConfig2 in scalaxb) { (c1, c2) =>
+      ScConfig(packageNames = c1.packageNames,
+        packageDir = c1.packageDir,
+        classPrefix = c1.classPrefix,
+        paramPrefix = c1.paramPrefix,
+        attributePrefix = c1.attributePrefix,
+        wrappedComplexTypes = c1.wrappedComplexTypes,
+        generateRuntime = c2.generateRuntime,
+        sequenceChunkSize = c2.sequenceChunkSize,
+        protocolFileName = c2.protocolFileName,
+        protocolPackageName = c2.protocolPackageName,
+        laxAny = c2.laxAny) },
     logLevel in scalaxb <<= logLevel?? Level.Info
   )
 }
+
+case class Config1(packageNames: Map[Option[String], Option[String]] = Map(None -> None),
+  classPrefix: Option[String] = None,
+  classPostfix: Option[String] = None,
+  paramPrefix: Option[String] = None,
+  attributePrefix: Option[String] = None,
+  outdir: File = new File("."),
+  packageDir: Boolean = false,
+  wrappedComplexTypes: List[String] = Nil,
+  prependFamilyName: Boolean = false) {}
+
+case class Config2(seperateProtocol: Boolean = true,
+  protocolFileName: String = "xmlprotocol.scala",
+  protocolPackageName: Option[String] = None,
+  defaultNamespace: Option[String] = None,
+  generateRuntime: Boolean = true,
+  contentsSizeLimit: Int = 20,
+  sequenceChunkSize: Int = 10,
+  laxAny: Boolean = false) {}
