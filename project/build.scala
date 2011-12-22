@@ -7,9 +7,9 @@ object Builds extends Build {
   lazy val buildSettings = Defaults.defaultSettings /*++ customLsSettings*/ ++ Seq(
     version := "0.6.7",
     organization := "org.scalaxb",
-    homepage := Some(url("http://scalaxb.org")),
-    licenses := Seq("MIT License" -> url("https://github.com/eed3si9n/scalaxb/blob/master/LICENSE")),
-    description := """scalaxb is an XML data-binding tool for Scala that supports W3C XML Schema (xsd) and wsdl.""",
+    // homepage := Some(url("http://scalaxb.org")),
+    // licenses := Seq("MIT License" -> url("https://github.com/eed3si9n/scalaxb/blob/master/LICENSE")),
+    // description := """scalaxb is an XML data-binding tool for Scala that supports W3C XML Schema (xsd) and wsdl.""",
     scalaVersion := "2.9.1",
     crossScalaVersions := Seq("2.9.1", "2.9.0-1", "2.8.1"), // Scala interpreter bug in 2.9.1
     publishArtifact in (Compile, packageBin) := true,
@@ -27,10 +27,10 @@ object Builds extends Build {
     parallelExecution in Test := false
   )
 
-  lazy val customLsSettings = _root_.ls.Plugin.lsSettings ++ Seq(
-    licenses in lsync <<= licenses,
-    tags in lsync := Seq("xml", "soap", "wsdl", "code-generation")
-  )
+//  lazy val customLsSettings = _root_.ls.Plugin.lsSettings ++ Seq(
+//    licenses in lsync <<= licenses,
+//    tags in lsync := Seq("xml", "soap", "wsdl", "code-generation")
+//  )
 
   val Xsd = config("xsd") extend(Compile)
   val Wsdl = config("wsdl") extend(Compile)
