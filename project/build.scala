@@ -5,22 +5,19 @@ object Builds extends Build {
 //  import ls.Plugin.LsKeys._
 
   lazy val buildSettings = Defaults.defaultSettings /*++ customLsSettings*/ ++ Seq(
-    version := "0.6.8",
+    version := "0.6.9",
     organization := "org.scalaxb",
     // homepage := Some(url("http://scalaxb.org")),
     // licenses := Seq("MIT License" -> url("https://github.com/eed3si9n/scalaxb/blob/master/LICENSE")),
     // description := """scalaxb is an XML data-binding tool for Scala that supports W3C XML Schema (xsd) and wsdl.""",
-    scalaVersion := "2.9.1",
+    scalaVersion := "2.8.1",
     crossScalaVersions := Seq("2.9.1", "2.9.0-1", "2.8.1"), // Scala interpreter bug in 2.9.1
-    publishArtifact in (Compile, packageBin) := true,
-    publishArtifact in (Test, packageBin) := false,
-    publishArtifact in (Compile, packageDoc) := false,
-    publishArtifact in (Compile, packageSrc) := false,
+    publishArtifact in Test := false,
     resolvers += ScalaToolsSnapshots,
     publishTo <<= version { (v: String) =>
-      val nexus = "http://nexus.scala-tools.org/content/repositories/"
-      if(v endsWith "-SNAPSHOT") Some("Scala Tools Nexus" at nexus + "snapshots/")
-      else Some("Scala Tools Nexus" at nexus + "releases/")
+      val nexus = "https://oss.sonatype.org/"
+      if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots") 
+      else Some("releases"  at nexus + "service/local/staging/deploy/maven2")
     },
     credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
     publishMavenStyle := true,

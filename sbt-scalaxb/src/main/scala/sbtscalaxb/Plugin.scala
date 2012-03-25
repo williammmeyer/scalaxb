@@ -21,7 +21,9 @@ object Plugin extends sbt.Plugin {
     lazy val classPrefix      = SettingKey[Option[String]]("scalaxb-class-prefix")
     lazy val paramPrefix      = SettingKey[Option[String]]("scalaxb-param-prefix")
     lazy val attributePrefix  = SettingKey[Option[String]]("scalaxb-attribute-prefix")
+    lazy val prependFamily    = SettingKey[Boolean]("scalaxb-prepend-family")
     lazy val wrapContents     = SettingKey[Seq[String]]("scalaxb-wrap-contents")
+    lazy val contentsSizeLimit = SettingKey[Int]("scalaxb-contents-size-limit")
     lazy val chunkSize        = SettingKey[Int]("scalaxb-chunk-size")
     lazy val packageDir       = SettingKey[Boolean]("scalaxb-package-dir")
     lazy val generateRuntime  = SettingKey[Boolean]("scalaxb-generate-runtime")
@@ -66,7 +68,9 @@ object Plugin extends sbt.Plugin {
     classPrefix in scalaxb := None,
     paramPrefix in scalaxb := None,
     attributePrefix in scalaxb := None,
+    prependFamily in scalaxb := false,
     wrapContents in scalaxb := Nil,
+    contentsSizeLimit in scalaxb := 20,
     chunkSize in scalaxb := 10,
     packageDir in scalaxb := true,
     generateRuntime in scalaxb := true,
@@ -80,19 +84,23 @@ object Plugin extends sbt.Plugin {
         classPrefix in scalaxb,
         paramPrefix in scalaxb,
         attributePrefix in scalaxb,
-        wrapContents in scalaxb) { (pkg, pkgdir, cpre, ppre, apre, w) =>
+        prependFamily in scalaxb,
+        wrapContents in scalaxb) { (pkg, pkgdir, cpre, ppre, apre, pf, w) =>
       Config1(packageNames = pkg,
         packageDir = pkgdir,
         classPrefix = cpre,
         paramPrefix = ppre,
         attributePrefix = apre,
+        prependFamilyName = pf, 
         wrappedComplexTypes = w.toList) },
-    scalaxbConfig2 in scalaxb <<= (generateRuntime in scalaxb,
+    scalaxbConfig2 in scalaxb <<= (contentsSizeLimit in scalaxb,
+        generateRuntime in scalaxb,
         chunkSize in scalaxb,
         protocolFileName in scalaxb,
         protocolPackageName in scalaxb,
-        laxAny in scalaxb) { (rt, cs, pfn, ppn, la) =>
-      Config2(generateRuntime = rt,
+        laxAny in scalaxb) { (csl, rt, cs, pfn, ppn, la) =>
+      Config2(contentsSizeLimit = csl,
+        generateRuntime = rt,
         sequenceChunkSize = cs,
         protocolFileName = pfn,
         protocolPackageName = ppn,
@@ -103,7 +111,9 @@ object Plugin extends sbt.Plugin {
         classPrefix = c1.classPrefix,
         paramPrefix = c1.paramPrefix,
         attributePrefix = c1.attributePrefix,
+        prependFamilyName = c1.prependFamilyName,
         wrappedComplexTypes = c1.wrappedComplexTypes,
+        contentsSizeLimit = c2.contentsSizeLimit,
         generateRuntime = c2.generateRuntime,
         sequenceChunkSize = c2.sequenceChunkSize,
         protocolFileName = c2.protocolFileName,
