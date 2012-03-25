@@ -21,6 +21,32 @@ object Builds extends Build {
     },
     credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
     publishMavenStyle := true,
+    pomExtra := (
+      <name>scalaxb</name>
+      <url>http://scalaxb.org</url>
+      <organization>
+        <name>org.scalaxb</name>
+        <url>http://scalaxb.org</url>
+      </organization>
+      <description>scalaxb is an XML data-binding tool for Scala that supports W3C XML Schema (xsd) and wsdl.</description>
+      <licenses>
+        <license>
+          <name>MIT License</name>
+          <url>https://github.com/eed3si9n/scalaxb/blob/master/LICENSE</url>
+          <distribution>repo</distribution>
+        </license>
+      </licenses>
+      <scm>
+        <url>git@github.com:eed3si9n/scalaxb.git</url>
+        <connection>scm:git:git@github.com:eed3si9n/scalaxb.git</connection>
+      </scm>
+      <developers>
+        <developer>
+          <id>eed3si9n</id>
+          <name>Eugene Yokota</name>
+          <url>http://eed3si9n.com</url>
+        </developer>
+      </developers>),
     parallelExecution in Test := false
   )
 
