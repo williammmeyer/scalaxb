@@ -726,7 +726,7 @@ JDREVGRw==</base64Binary>
     val withBoolean = scalaxb.fromXML[LiteralBoolean](subject)
     System.err.println("received:"+withBoolean)
     def check(obj: LiteralBoolean) = obj match {
-      case LiteralBoolean(attributes) if attributes("@avail") == true =>
+      case LiteralBoolean(attributes) if attributes("@avail").value == true =>
       case _ => sys.error("match failed: " + obj.toString)
     }
     check(withBoolean)
